@@ -45,10 +45,11 @@ docker-compose.override.yml
 
 # Gradle файлы
 .gradle/
-!gradle-wrapper.jar
 gradle/wrapper/gradle-wrapper.properties
 
 # IDE и другие конфигурации
 .vscode/
 *.swp
 *.swo
+/gradle/wrapper/gradle-wrapper.jar
+/HELP.md
