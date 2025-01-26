@@ -1,75 +1,54 @@
-HELP.md
-.gradle
+# Maven и Gradle каталоги
+.mvn/
+target/
 build/
-!gradle/wrapper/gradle-wrapper.jar
-!**/src/main/**/build/
-!**/src/test/**/build/
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-bin/
-!**/src/main/**/bin/
-!**/src/test/**/bin/
-
-### IntelliJ IDEA ###
-.idea
-*.iws
+# IntelliJ IDEA файлы
+.idea/
 *.iml
-*.ipr
+*.iws
 out/
-!**/src/main/**/out/
-!**/src/test/**/out/
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
+# MacOS системные файлы
+.DS_Store
 
-### VS Code ###
-.vscode/
+# Windows системные файлы
+Thumbs.db
+ehthumbs.db
 
-# Compiled class file
+# Linux системные файлы
+*~
+
+# Логи
+*.log
+logs/
+
+# Runtime файлы
+*.pid
+*.seed
+*.pid.lock
+
+# Кэш приложения
+.cache/
 *.class
 
-# Log file
-*.log
+# Конфиденциальные файлы
+*.key
+*.pem
+*.crt
+*.env
 
-# BlueJ files
-*.ctxt
-
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files #
-*.jar
+# Docker
 *.war
-*.nar
-*.ear
-*.zip
-*.tar.gz
-*.rar
+*.jar
+docker-compose.override.yml
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
+# Gradle файлы
+.gradle/
+!gradle-wrapper.jar
+gradle/wrapper/gradle-wrapper.properties
 
-replay_pid*
-*.pydevproject
-.metadata
-bin/**
-tmp/**
-tmp/**/*
-*.tmp
-*.bak
+# IDE и другие конфигурации
+.vscode/
 *.swp
-*~.nib
-local.properties
-.settings/
-.loadpath
+*.swo
