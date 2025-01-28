@@ -1,4 +1,4 @@
-package ru.kolpakovee.user_service;
+package ru.kolpakovee.userservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
