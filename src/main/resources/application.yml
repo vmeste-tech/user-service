@@ -23,3 +23,6 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: http://localhost:8080/realms/test-realm
+
+keycloak:
+  auth-server-url: https://auth.vmeste.tech
