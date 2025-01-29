@@ -26,3 +26,7 @@ spring:
 
 keycloak:
   auth-server-url: https://auth.vmeste.tech
+  realm-name: main
+  clientId: admin-cli
+  username: admin
+  password: admin

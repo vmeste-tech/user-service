@@ -20,14 +20,24 @@ public class ApartmentsController {
     private final ApartmentService apartmentService;
     private final ApartmentUserService apartmentUserService;
 
+    @GetMapping("/{apartmentId}")
+    public GetApartmentResponse getApartment(@PathVariable UUID apartmentId) {
+        return apartmentService.getApartment(apartmentId);
+    }
+
+    @GetMapping("/{apartmentId}/users")
+    public List<GetUserResponse> getApartmentUsers(@PathVariable UUID apartmentId) {
+        return apartmentUserService.getApartmentUsers(apartmentId);
+    }
+
     @PostMapping
     public CreateApartmentResponse createApartment(@RequestBody CreateApartmentRequest request) {
         return apartmentService.createApartment(request);
     }
 
-    @GetMapping("/{apartmentId}")
-    public GetApartmentResponse getApartment(@PathVariable UUID apartmentId) {
-        return apartmentService.getApartment(apartmentId);
+    @PostMapping("/{apartmentId}/users/{userId}")
+    public AddToApartmentResponse addToApartment(@PathVariable UUID apartmentId, @PathVariable UUID userId) {
+        return apartmentUserService.addToApartment(apartmentId, userId);
     }
 
     @PutMapping("/{apartmentId}")
@@ -42,19 +52,9 @@ public class ApartmentsController {
         apartmentService.deleteApartment(apartmentId);
     }
 
-    @PostMapping("/{apartmentId}/users/{userId}")
-    public AddToApartmentResponse addToApartment(@PathVariable UUID apartmentId, @PathVariable UUID userId) {
-        return apartmentUserService.addToApartment(apartmentId, userId);
-    }
-
     @DeleteMapping("/{apartmentId}/users/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteFromApartment(@PathVariable UUID apartmentId, @PathVariable UUID userId) {
         apartmentUserService.deleteFromApartment(apartmentId, userId);
-    }
-
-    @GetMapping("/{apartmentId}/users")
-    public List<GetUserResponse> getApartmentUsers(@PathVariable UUID apartmentId) {
-        return apartmentUserService.getApartmentUsers(apartmentId);
     }
 }
