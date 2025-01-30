@@ -1,0 +1,54 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: kolpakovee
+      changes:
+        - createTable:
+            tableName: apartments
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(100)
+              - column:
+                  name: address
+                  type: TEXT
+
+        - createTable:
+            tableName: apartment_users
+            columns:
+              - column:
+                  name: apartment_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: joined_at
+                  type: TIMESTAMP
+
+        - addPrimaryKey:
+            tableName: apartment_users
+            columnNames: apartment_id, user_id
+
+        - addForeignKeyConstraint:
+            baseTableName: apartment_users
+            baseColumnNames: apartment_id
+            referencedTableName: apartments
+            referencedColumnNames: id
+            constraintName: fk_apartment_users_apartment
+
+      rollback:
+        - dropTable:
+            tableName: apartment_users
+        - dropTable:
+            tableName: apartments

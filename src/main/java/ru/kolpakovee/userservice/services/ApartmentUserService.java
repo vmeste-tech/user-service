@@ -1,13 +1,15 @@
 package ru.kolpakovee.userservice.services;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.kolpakovee.userservice.entities.ApartmentEntity;
 import ru.kolpakovee.userservice.entities.ApartmentUserEntity;
-import ru.kolpakovee.userservice.entities.ApartmentUserEntityPK;
+import ru.kolpakovee.userservice.entities.ApartmentUserId;
 import ru.kolpakovee.userservice.entities.UserEntity;
 import ru.kolpakovee.userservice.models.apartments.AddToApartmentResponse;
-import ru.kolpakovee.userservice.models.apartments.GetApartmentResponse;
 import ru.kolpakovee.userservice.models.users.GetUserResponse;
+import ru.kolpakovee.userservice.repositories.ApartmentRepository;
 import ru.kolpakovee.userservice.repositories.ApartmentUserRepository;
 import ru.kolpakovee.userservice.repositories.UserRepository;
 
@@ -20,40 +22,56 @@ import java.util.UUID;
 public class ApartmentUserService {
 
     private final ApartmentUserRepository apartmentUserRepository;
+    private final ApartmentRepository apartmentRepository;
     private final UserRepository userRepository;
+    private final UserService userService;
 
     public AddToApartmentResponse addToApartment(UUID apartmentId, UUID userId) {
-        // TODO: подумать, нужна ли проверка на существование юзера или квартиры?
-        ApartmentUserEntity newApartmentUser = new ApartmentUserEntity(apartmentId, userId, LocalDateTime.now());
-        newApartmentUser = apartmentUserRepository.save(newApartmentUser);
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден."));
+
+        ApartmentEntity apartment = apartmentRepository.findById(apartmentId)
+                .orElseThrow(() -> new EntityNotFoundException("Квартира не найдена."));
+
+        ApartmentUserEntity newApartmentUser = apartmentUserRepository.save(createApartmentUser(user, apartment));
 
         return AddToApartmentResponse.builder()
-                .apartmentId(newApartmentUser.getApartmentId())
-                .userId(newApartmentUser.getUserId())
+                .apartmentId(newApartmentUser.getId().getApartmentId())
+                .userId(newApartmentUser.getId().getUserId())
                 .joinedAt(newApartmentUser.getJoinedAt())
                 .build();
     }
 
     public void deleteFromApartment(UUID apartmentId, UUID userId) {
-        apartmentUserRepository.deleteById(new ApartmentUserEntityPK(userId, apartmentId));
+        ApartmentUserId id = new ApartmentUserId();
+        id.setApartmentId(apartmentId);
+        id.setUserId(userId);
+
+        apartmentUserRepository.deleteById(id);
     }
 
     public List<GetUserResponse> getApartmentUsers(UUID apartmentId) {
         // TODO: Может можно как-то достать только UUIDs, а не все данные, а потом преобразовывать?
-        List<UUID> userIds = apartmentUserRepository.findAllByApartmentId(apartmentId)
+        return apartmentUserRepository.findAllByIdApartmentId(apartmentId)
                 .stream()
-                .map(ApartmentUserEntity::getUserId)
+                .map(a -> a.getId().getUserId())
+                .map(userService::getUser)
                 .toList();
+    }
 
-        List<UserEntity> users = userRepository.findAllById(userIds);
+    private ApartmentUserEntity createApartmentUser(UserEntity user, ApartmentEntity apartment) {
+        ApartmentUserEntity newApartmentUser = new ApartmentUserEntity();
+        newApartmentUser.setId(createApartmentUserId(user.getId(), apartment.getId()));
+        newApartmentUser.setJoinedAt(LocalDateTime.now());
 
-        return users.stream()
-                .map(user -> GetUserResponse.builder()
-                        .id(String.valueOf(user.getId()))
-                        .username(user.getUsername())
-                        .firstName(user.getFirstName())
-                        .lastName(user.getLastName())
-                        .build())
-                .toList();
+        return newApartmentUser;
+    }
+
+    private ApartmentUserId createApartmentUserId(UUID userId, UUID apartmentId) {
+        ApartmentUserId apartmentUserId = new ApartmentUserId();
+        apartmentUserId.setApartmentId(apartmentId);
+        apartmentUserId.setUserId(userId);
+
+        return apartmentUserId;
     }
 }

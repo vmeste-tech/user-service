@@ -26,7 +26,9 @@ spring:
 
 keycloak:
   auth-server-url: ${KEYCLOAK_AUTH_SERVER_URL:http://localhost:8080} #https://auth.vmeste.tech
-  realm-name: ${KEYCLOAK_REALM_NAME:vmeste-tech}
-  clientId: ${KEYCLOAK_CLIENT_ID:admin-cli}
-  username: ${KEYCLOAK_USERNAME:admin}
-  password: ${KEYCLOAK_PASSWORD:admin}
+  realm-name: ${KEYCLOAK_REALM_NAME:test-realm}
+  client-id: ${KEYCLOAK_CLIENT_ID:user-service}
+  client-secret: ${KEYCLOAK_CLIENT_SECRET:msEPsjCwHQp3Aa5DoVT187FMGYok8K61} # Для confidential clients
+  admin:
+    username: admin
+    password: admin

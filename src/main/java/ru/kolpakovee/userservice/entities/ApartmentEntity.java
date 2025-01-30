@@ -1,14 +1,13 @@
 package ru.kolpakovee.userservice.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
 
 import java.util.UUID;
 
@@ -21,12 +20,13 @@ import java.util.UUID;
 public class ApartmentEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(updatable = false, nullable = false)
     private UUID id;
 
-    @Size(max = 50)
-    @NotBlank
+    @Column(length = 100)
     private String name;
 
-    @NotBlank
+    @Column(columnDefinition = "TEXT")
     private String address;
 }

@@ -8,6 +8,9 @@ import ru.kolpakovee.userservice.models.apartments.ChangePasswordRequest;
 import ru.kolpakovee.userservice.models.users.GetUserResponse;
 import ru.kolpakovee.userservice.repositories.UserRepository;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.UUID;
 
 @Service
@@ -29,7 +32,7 @@ public class UserService {
                 .firstName(userRepresentation.getFirstName())
                 .lastName(userRepresentation.getLastName())
                 .email(userRepresentation.getEmail())
-                .createdAt(userRepresentation.getCreatedTimestamp())
+                .createdAt(LocalDateTime.ofInstant(Instant.ofEpochMilli(userRepresentation.getCreatedTimestamp()), ZoneId.systemDefault()))
                 .profilePictureUrl(user.getProfilePictureUrl())
                 .build();
     }
@@ -39,13 +42,8 @@ public class UserService {
     }
 
     private UserEntity createUser(UserRepresentation user) {
-        UserEntity newUser = UserEntity.builder()
-                .id(UUID.fromString(user.getId()))
-                .username(user.getUsername())
-                .createdAt(user.getCreatedTimestamp())
-                .lastName(user.getLastName())
-                .firstName(user.getFirstName())
-                .build();
+        UserEntity newUser = new UserEntity();
+        newUser.setId(UUID.fromString(user.getId()));
 
         return repository.save(newUser);
     }

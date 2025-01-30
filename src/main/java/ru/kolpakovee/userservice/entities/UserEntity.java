@@ -1,34 +1,21 @@
 package ru.kolpakovee.userservice.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.util.UUID;
 
 //TODO: подумать над минимальным набором аннотация для Entity
-@Data
 @Entity
-@Builder
+@Getter
+@Setter
 @Table(name = "users")
-@AllArgsConstructor
-@NoArgsConstructor
 public class UserEntity {
 
     @Id
+    @Column(nullable = false)
     private UUID id;
 
-    private String username;
-
-    private String firstName;
-
-    private String lastName;
-
+    @Column(length = 100)
     private String profilePictureUrl;
-
-    private Long createdAt;
 }
