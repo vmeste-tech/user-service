@@ -15,8 +15,6 @@ import java.util.UUID;
 @Setter
 @Entity
 @Table(name = "apartments")
-@AllArgsConstructor
-@NoArgsConstructor
 public class ApartmentEntity {
 
     @Id

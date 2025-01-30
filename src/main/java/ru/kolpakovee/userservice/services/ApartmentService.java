@@ -1,5 +1,6 @@
 package ru.kolpakovee.userservice.services;
 
+import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,10 +16,10 @@ import java.util.UUID;
 public class ApartmentService {
 
     private final ApartmentRepository apartmentRepository;
+    private final ApartmentUserRepository apartmentUserRepository;
 
     public CreateApartmentResponse createApartment(CreateApartmentRequest request) {
-        ApartmentEntity newApartment = new ApartmentEntity(UUID.randomUUID(), request.getName(), request.getAddress());
-        ApartmentEntity apartment = apartmentRepository.save(newApartment);
+        ApartmentEntity apartment = createApartmentEntity(request);
 
         return CreateApartmentResponse.builder()
                 .apartmentId(apartment.getId())
@@ -33,23 +34,26 @@ public class ApartmentService {
                 .orElseThrow(() -> new NotFoundException("Квартира не найдена."));
     }
 
+    @Transactional
     public UpdateApartmentResponse updateApartment(UUID apartmentId, UpdateApartmentRequest request) {
         ApartmentEntity existedApartment = apartmentRepository.findById(apartmentId)
                 .orElseThrow(() -> new NotFoundException("Квартира не существует."));
 
-        ApartmentEntity newApartment =
-                new ApartmentEntity(existedApartment.getId(), request.getName(), request.getAddress());
+        existedApartment.setAddress(request.getAddress());
+        existedApartment.setName(request.getName());
 
-        newApartment = apartmentRepository.save(newApartment);
+        existedApartment = apartmentRepository.save(existedApartment);
 
         return UpdateApartmentResponse.builder()
-                .id(newApartment.getId())
-                .address(newApartment.getAddress())
-                .name(newApartment.getName())
+                .id(existedApartment.getId())
+                .address(existedApartment.getAddress())
+                .name(existedApartment.getName())
                 .build();
     }
 
+    @Transactional
     public void deleteApartment(UUID apartmentId) {
+        apartmentUserRepository.deleteAllByIdApartmentId(apartmentId);
         apartmentRepository.deleteById(apartmentId);
     }
 
@@ -58,5 +62,13 @@ public class ApartmentService {
                 .address(apartment.getAddress())
                 .name(apartment.getName())
                 .build();
+    }
+
+    private ApartmentEntity createApartmentEntity(CreateApartmentRequest request) {
+        ApartmentEntity newApartment = new ApartmentEntity();
+        newApartment.setName(request.getName());
+        newApartment.setAddress(request.getAddress());
+
+        return apartmentRepository.save(newApartment);
     }
 }
