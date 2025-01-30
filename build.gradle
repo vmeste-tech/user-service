@@ -27,6 +27,7 @@ dependencies {
 	implementation 'org.keycloak:keycloak-admin-client:26.0.4'
 
 	compileOnly 'org.projectlombok:lombok:1.18.36'
+	annotationProcessor 'org.projectlombok:lombok:1.18.36'
 
 	runtimeOnly 'org.postgresql:postgresql'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
