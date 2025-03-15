@@ -8,12 +8,15 @@ import ru.kolpakovee.userservice.entities.ApartmentUserEntity;
 import ru.kolpakovee.userservice.entities.ApartmentUserId;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface ApartmentUserRepository extends JpaRepository<ApartmentUserEntity, ApartmentUserId> {
 
     List<ApartmentUserEntity> findAllByIdApartmentId(UUID apartmentId);
+
+    Optional<ApartmentUserEntity> findByIdUserId(UUID userId);
 
     @Transactional
     @Modifying

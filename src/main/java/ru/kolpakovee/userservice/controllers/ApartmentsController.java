@@ -2,9 +2,12 @@ package ru.kolpakovee.userservice.controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import ru.kolpakovee.userservice.models.apartments.*;
 import ru.kolpakovee.userservice.models.users.GetUserResponse;
+import ru.kolpakovee.userservice.records.ApartmentInfo;
 import ru.kolpakovee.userservice.services.ApartmentService;
 import ru.kolpakovee.userservice.services.ApartmentUserService;
 
@@ -19,6 +22,12 @@ public class ApartmentsController {
 
     private final ApartmentService apartmentService;
     private final ApartmentUserService apartmentUserService;
+
+    @GetMapping("/by-user")
+    public ApartmentInfo findApartmentByUser(@AuthenticationPrincipal Jwt jwt) {
+        String userId = jwt.getSubject();
+        return apartmentService.findApartment(UUID.fromString(userId));
+    }
 
     @GetMapping("/{apartmentId}")
     public GetApartmentResponse getApartment(@PathVariable UUID apartmentId) {

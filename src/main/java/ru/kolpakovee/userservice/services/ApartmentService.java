@@ -5,10 +5,16 @@ import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.kolpakovee.userservice.entities.ApartmentEntity;
+import ru.kolpakovee.userservice.entities.ApartmentUserEntity;
 import ru.kolpakovee.userservice.models.apartments.*;
+import ru.kolpakovee.userservice.models.users.GetUserResponse;
+import ru.kolpakovee.userservice.records.ApartmentInfo;
+import ru.kolpakovee.userservice.records.UserInfoDto;
 import ru.kolpakovee.userservice.repositories.ApartmentRepository;
 import ru.kolpakovee.userservice.repositories.ApartmentUserRepository;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -17,6 +23,8 @@ public class ApartmentService {
 
     private final ApartmentRepository apartmentRepository;
     private final ApartmentUserRepository apartmentUserRepository;
+
+    private final UserService userService;
 
     public CreateApartmentResponse createApartment(CreateApartmentRequest request) {
         ApartmentEntity apartment = createApartmentEntity(request);
@@ -70,5 +78,42 @@ public class ApartmentService {
         newApartment.setAddress(request.getAddress());
 
         return apartmentRepository.save(newApartment);
+    }
+
+    @Transactional
+    public ApartmentInfo findApartment(UUID userId) {
+        UUID apartmentId = apartmentUserRepository.findByIdUserId(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь не проживает в квартирах."))
+                .getId()
+                .getApartmentId();
+
+        List<ApartmentUserEntity> users = apartmentUserRepository.findAllByIdApartmentId(apartmentId);
+
+        ApartmentEntity apartment = apartmentRepository.findById(apartmentId)
+                .orElseThrow(() -> new NotFoundException("Квартира не найдена."));
+
+        return ApartmentInfo.builder()
+                .apartmentId(apartment.getId())
+                .address(apartment.getAddress())
+                .name(apartment.getName())
+                .users(users.stream()
+                        // TODO: оптимизировать кол-во запросов
+                        .map(u -> toUserInfoDto(u.getJoinedAt(), userService.getUser(userId)))
+                        .toList())
+                .build();
+    }
+
+    // TODO: использовать мапер
+    private UserInfoDto toUserInfoDto(LocalDateTime joinedAt, GetUserResponse user) {
+        return UserInfoDto.builder()
+                // TODO: реализовать логику хранения типа и статуса
+                .type("Пользователь")
+                .status("Активен")
+                .name(user.getFirstName())
+                .lastname(user.getLastName())
+                .photoUrl(user.getProfilePictureUrl())
+                .joinedAt(joinedAt)
+                .id(user.getId())
+                .build();
     }
 }
