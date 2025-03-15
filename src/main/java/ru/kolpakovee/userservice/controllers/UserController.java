@@ -2,6 +2,8 @@ package ru.kolpakovee.userservice.controllers;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import ru.kolpakovee.userservice.models.apartments.ChangePasswordRequest;
 import ru.kolpakovee.userservice.models.users.GetUserResponse;
@@ -19,9 +21,10 @@ public class UserController {
 
     private final UserService userService;
 
-    @GetMapping("/{userId}")
-    public GetUserResponse getUser(@PathVariable UUID userId) {
-        return userService.getUser(userId);
+    @GetMapping("/me")
+    public GetUserResponse getUser(@AuthenticationPrincipal Jwt jwt) {
+        String userId = jwt.getSubject();
+        return userService.getUser(UUID.fromString(userId));
     }
 
     @PostMapping("/register")
