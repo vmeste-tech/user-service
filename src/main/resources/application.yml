@@ -7,9 +7,9 @@ spring:
       user-service
 
   datasource:
-    url: ${SPRING_DATASOURCE_URL}
-    username: ${SPRING_DATASOURCE_USERNAME}
-    password: ${SPRING_DATASOURCE_PASSWORD}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/user_db}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
   jpa:
     hibernate:
       ddl-auto: validate
@@ -25,10 +25,7 @@ spring:
           issuer-uri: http://localhost:8080/realms/test-realm
 
 keycloak:
-  auth-server-url: ${KEYCLOAK_AUTH_SERVER_URL:http://localhost:8080} #https://auth.vmeste.tech
+  auth-server-url: ${KEYCLOAK_AUTH_SERVER_URL:http://localhost:8080}
   realm-name: ${KEYCLOAK_REALM_NAME:test-realm}
   client-id: ${KEYCLOAK_CLIENT_ID:user-service}
-  client-secret: ${KEYCLOAK_CLIENT_SECRET:msEPsjCwHQp3Aa5DoVT187FMGYok8K61} # Для confidential clients
-  admin:
-    username: admin
-    password: admin
+  client-secret: ${KEYCLOAK_CLIENT_SECRET:msEPsjCwHQp3Aa5DoVT187FMGYok8K61}

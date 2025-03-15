@@ -11,9 +11,9 @@ import ru.kolpakovee.userservice.services.ApartmentUserService;
 import java.util.List;
 import java.util.UUID;
 
+@CrossOrigin
 @RestController
-//TODO: версия должна быть в конце или начале?
-@RequestMapping("/api/apartments/v1")
+@RequestMapping("/api/v1/apartments")
 @RequiredArgsConstructor
 public class ApartmentsController {
 
