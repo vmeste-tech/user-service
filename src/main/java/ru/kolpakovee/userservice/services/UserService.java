@@ -5,8 +5,9 @@ import lombok.RequiredArgsConstructor;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.stereotype.Service;
 import ru.kolpakovee.userservice.entities.UserEntity;
+import ru.kolpakovee.userservice.enums.UserStatus;
 import ru.kolpakovee.userservice.models.apartments.ChangePasswordRequest;
-import ru.kolpakovee.userservice.models.users.GetUserResponse;
+import ru.kolpakovee.userservice.records.GetUserResponse;
 import ru.kolpakovee.userservice.records.UserRegistrationRequest;
 import ru.kolpakovee.userservice.records.UserResponse;
 import ru.kolpakovee.userservice.repositories.UserRepository;
@@ -31,12 +32,12 @@ public class UserService {
 
         return GetUserResponse.builder()
                 .id(userRepresentation.getId())
-                .username(userRepresentation.getUsername())
                 .firstName(userRepresentation.getFirstName())
                 .lastName(userRepresentation.getLastName())
                 .email(userRepresentation.getEmail())
                 .createdAt(LocalDateTime.ofInstant(Instant.ofEpochMilli(userRepresentation.getCreatedTimestamp()), ZoneId.systemDefault()))
                 .profilePictureUrl(user.getProfilePictureUrl())
+                .status(user.getStatus())
                 .build();
     }
 
@@ -54,6 +55,7 @@ public class UserService {
     private UserEntity createUser(String userId) {
         UserEntity newUser = new UserEntity();
         newUser.setId(UUID.fromString(userId));
+        newUser.setStatus(UserStatus.ACTIVE);
 
         return repository.save(newUser);
     }

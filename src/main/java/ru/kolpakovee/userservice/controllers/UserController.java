@@ -6,7 +6,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import ru.kolpakovee.userservice.models.apartments.ChangePasswordRequest;
-import ru.kolpakovee.userservice.models.users.GetUserResponse;
+import ru.kolpakovee.userservice.records.GetUserResponse;
 import ru.kolpakovee.userservice.records.UserRegistrationRequest;
 import ru.kolpakovee.userservice.records.UserResponse;
 import ru.kolpakovee.userservice.services.UserService;

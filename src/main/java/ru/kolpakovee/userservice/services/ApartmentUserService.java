@@ -8,7 +8,7 @@ import ru.kolpakovee.userservice.entities.ApartmentUserEntity;
 import ru.kolpakovee.userservice.entities.ApartmentUserId;
 import ru.kolpakovee.userservice.entities.UserEntity;
 import ru.kolpakovee.userservice.models.apartments.AddToApartmentResponse;
-import ru.kolpakovee.userservice.models.users.GetUserResponse;
+import ru.kolpakovee.userservice.records.GetUserResponse;
 import ru.kolpakovee.userservice.repositories.ApartmentRepository;
 import ru.kolpakovee.userservice.repositories.ApartmentUserRepository;
 import ru.kolpakovee.userservice.repositories.UserRepository;
@@ -51,7 +51,6 @@ public class ApartmentUserService {
     }
 
     public List<GetUserResponse> getApartmentUsers(UUID apartmentId) {
-        // TODO: Может можно как-то достать только UUIDs, а не все данные, а потом преобразовывать?
         return apartmentUserRepository.findAllByIdApartmentId(apartmentId)
                 .stream()
                 .map(a -> a.getId().getUserId())

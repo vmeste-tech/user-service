@@ -6,7 +6,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import ru.kolpakovee.userservice.models.apartments.*;
-import ru.kolpakovee.userservice.models.users.GetUserResponse;
+import ru.kolpakovee.userservice.records.GetUserResponse;
 import ru.kolpakovee.userservice.records.ApartmentInfo;
 import ru.kolpakovee.userservice.services.ApartmentService;
 import ru.kolpakovee.userservice.services.ApartmentUserService;

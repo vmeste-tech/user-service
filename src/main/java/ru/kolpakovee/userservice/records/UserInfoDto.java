@@ -1,6 +1,7 @@
 package ru.kolpakovee.userservice.records;
 
 import lombok.Builder;
+import ru.kolpakovee.userservice.enums.UserStatus;
 
 import java.time.LocalDateTime;
 
@@ -12,6 +13,6 @@ public record UserInfoDto(
         String photoUrl,
         String type,
         LocalDateTime joinedAt,
-        String status
+        UserStatus status
 ) {
 }

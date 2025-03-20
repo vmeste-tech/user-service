@@ -6,8 +6,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.kolpakovee.userservice.entities.ApartmentEntity;
 import ru.kolpakovee.userservice.entities.ApartmentUserEntity;
+import ru.kolpakovee.userservice.enums.UserStatus;
 import ru.kolpakovee.userservice.models.apartments.*;
-import ru.kolpakovee.userservice.models.users.GetUserResponse;
+import ru.kolpakovee.userservice.records.GetUserResponse;
 import ru.kolpakovee.userservice.records.ApartmentInfo;
 import ru.kolpakovee.userservice.records.UserInfoDto;
 import ru.kolpakovee.userservice.repositories.ApartmentRepository;
@@ -106,14 +107,13 @@ public class ApartmentService {
     // TODO: использовать мапер
     private UserInfoDto toUserInfoDto(LocalDateTime joinedAt, GetUserResponse user) {
         return UserInfoDto.builder()
-                // TODO: реализовать логику хранения типа и статуса
                 .type("Пользователь")
-                .status("Активен")
-                .name(user.getFirstName())
-                .lastname(user.getLastName())
-                .photoUrl(user.getProfilePictureUrl())
+                .status(UserStatus.ACTIVE)
+                .name(user.firstName())
+                .lastname(user.lastName())
+                .photoUrl(user.profilePictureUrl())
                 .joinedAt(joinedAt)
-                .id(user.getId())
+                .id(user.id())
                 .build();
     }
 }
