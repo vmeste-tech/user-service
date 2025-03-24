@@ -62,6 +62,7 @@ public class ApartmentService {
 
     @Transactional
     public void deleteApartment(UUID apartmentId) {
+        // TODO: удалить все правила и задачи
         apartmentUserRepository.deleteAllByIdApartmentId(apartmentId);
         apartmentRepository.deleteById(apartmentId);
     }

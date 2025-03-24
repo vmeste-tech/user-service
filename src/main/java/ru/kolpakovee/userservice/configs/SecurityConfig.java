@@ -16,13 +16,17 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/**").permitAll()
-                        .requestMatchers("/api/v1/users/register").permitAll()
-                        .anyRequest().authenticated()
-                ).csrf(AbstractHttpConfigurer::disable)
+        http
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/v1/auth/login",
+                                "/api/v1/auth/refresh",
+                                "/api/v1/users/register").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .anyRequest().authenticated())
+                .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
-                .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults()));
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
         return http.build();
     }
+
 }

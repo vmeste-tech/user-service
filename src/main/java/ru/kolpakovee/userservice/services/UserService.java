@@ -52,6 +52,10 @@ public class UserService {
         return user;
     }
 
+    public void deleteUser(UUID userId) {
+        repository.deleteById(userId);
+    }
+
     private UserEntity createUser(String userId) {
         UserEntity newUser = new UserEntity();
         newUser.setId(UUID.fromString(userId));
