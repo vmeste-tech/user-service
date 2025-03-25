@@ -100,7 +100,7 @@ public class ApartmentService {
                 .name(apartment.getName())
                 .users(users.stream()
                         // TODO: оптимизировать кол-во запросов
-                        .map(u -> toUserInfoDto(u.getJoinedAt(), userService.getUser(userId)))
+                        .map(u -> toUserInfoDto(u.getJoinedAt(), userService.getUser(u.getId().getUserId())))
                         .toList())
                 .build();
     }
