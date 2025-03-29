@@ -4,7 +4,7 @@ set -e
 echo "Ожидание запуска Keycloak..."
 # Ждём Keycloak (проверяем endpoint master)
 for i in $(seq 1 30); do
-  if curl -s -f "${KEYCLOAK_URL}/realms/master" > /dev/null; then
+  if curl -s -f "${KEYCLOAK_AUTH_SERVER_URL}/realms/master" > /dev/null; then
     echo "✅ Keycloak доступен!"
     break
   fi
@@ -13,7 +13,7 @@ for i in $(seq 1 30); do
 done
 
 echo "Получение токена администратора..."
-TOKEN_RESPONSE=$(curl -s -X POST "${KEYCLOAK_URL}/realms/master/protocol/openid-connect/token" \
+TOKEN_RESPONSE=$(curl -s -X POST "${KEYCLOAK_AUTH_SERVER_URL}/realms/master/protocol/openid-connect/token" \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "username=${KEYCLOAK_ADMIN}" \
   -d "password=${KEYCLOAK_ADMIN_PASSWORD}" \
@@ -28,7 +28,7 @@ fi
 echo "✅ Токен администратора получен."
 
 echo "Получение UUID клиента для ${KEYCLOAK_CLIENT_ID}..."
-CLIENTS_RESPONSE=$(curl -s -X GET "${KEYCLOAK_URL}/admin/realms/${KEYCLOAK_REALM}/clients" \
+CLIENTS_RESPONSE=$(curl -s -X GET "${KEYCLOAK_AUTH_SERVER_URL}/admin/realms/${KEYCLOAK_REALM_NAME}/clients" \
   -H "Authorization: Bearer ${TOKEN}")
 
 CLIENT_UUID=$(echo "$CLIENTS_RESPONSE" | grep -o '"id":"[^"]*","clientId":"'${KEYCLOAK_CLIENT_ID}'"' | awk -F'"' '{print $4}')
@@ -39,7 +39,7 @@ fi
 echo "✅ UUID клиента найден: ${CLIENT_UUID}"
 
 echo "Получение client secret..."
-SECRET_RESPONSE=$(curl -s -X GET "${KEYCLOAK_URL}/admin/realms/${KEYCLOAK_REALM}/clients/${CLIENT_UUID}/client-secret" \
+SECRET_RESPONSE=$(curl -s -X GET "${KEYCLOAK_AUTH_SERVER_URL}/admin/realms/${KEYCLOAK_REALM_NAME}/clients/${CLIENT_UUID}/client-secret" \
   -H "Authorization: Bearer ${TOKEN}")
 
 CLIENT_SECRET=$(echo "$SECRET_RESPONSE" | grep -o '"value":"[^"]*"' | awk -F':' '{print $2}' | tr -d '"')
