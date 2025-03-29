@@ -1,6 +1,9 @@
 # Используем официальный образ OpenJDK
 FROM openjdk:23-jdk-slim
 
+# Обновляем пакеты и устанавливаем curl
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
 # Указываем рабочую директорию
 WORKDIR /app
 
