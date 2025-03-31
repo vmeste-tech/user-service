@@ -79,7 +79,7 @@ jobs:
             echo "Pulling latest image for user-service..."
             docker-compose pull user-service
             echo "Deploying user-service..."
-            docker-compose up -d user-service
+            docker-compose up -d --force-recreate user-service
             echo "Deployment of user-service completed at $(date)"
             docker-compose ps user-service
           EOF
