@@ -15,5 +15,11 @@ public class GlobalExceptionHandler {
     public Response handleException(NotFoundException e) {
         return new Response(e.getMessage());
     }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Response handleException(ResourceNotFoundException e) {
+        return new Response(e.getMessage());
+    }
 }
 

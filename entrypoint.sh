@@ -47,7 +47,7 @@ if [ -z "$CLIENT_SECRET" ]; then
   echo "❌ Не удалось получить client secret!"
   exit 1
 fi
-echo "✅ Новый client secret: ${CLIENT_SECRET}"
+echo "✅ Client secret: ${CLIENT_SECRET}"
 
 # Устанавливаем переменную окружения и запускаем приложение
 export KEYCLOAK_CLIENT_SECRET="${CLIENT_SECRET}"

@@ -56,3 +56,28 @@ jobs:
         run: |
           docker tag ${{ secrets.DOCKER_USERNAME }}/${{ secrets.BE_PROJECT_NAME }}:${{ github.sha }} ${{ secrets.DOCKER_USERNAME }}/${{ secrets.BE_PROJECT_NAME }}:latest
           docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.BE_PROJECT_NAME }}:latest
+  deploy-user-service:
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    name: Deploy User Service
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up SSH for deployment
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add server to known_hosts for deployment
+        run: |
+          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+
+      - name: Deploy user-service using common docker-compose
+        run: |
+          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+            cd /home/${{ secrets.SERVER_USER }}/microservices
+            echo "Pulling latest image for user-service..."
+            docker-compose pull user-service
+            echo "Deploying user-service..."
+            docker-compose up -d user-service
+            echo "Deployment of user-service completed at $(date)"
+            docker-compose ps user-service
+          EOF
