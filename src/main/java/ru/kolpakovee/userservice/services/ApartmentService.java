@@ -26,9 +26,12 @@ public class ApartmentService {
     private final ApartmentUserRepository apartmentUserRepository;
 
     private final UserService userService;
+    private final ApartmentUserService apartmentUserService;
 
-    public CreateApartmentResponse createApartment(CreateApartmentRequest request) {
+    @Transactional
+    public CreateApartmentResponse createApartment(CreateApartmentRequest request, UUID userId) {
         ApartmentEntity apartment = createApartmentEntity(request);
+        apartmentUserService.addToApartment(apartment.getId(), userId);
 
         return CreateApartmentResponse.builder()
                 .apartmentId(apartment.getId())

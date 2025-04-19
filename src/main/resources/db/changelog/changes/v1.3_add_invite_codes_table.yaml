@@ -1,0 +1,24 @@
+databaseChangeLog:
+  - changeSet:
+      id: 5
+      author: kolpakovee
+      changes:
+        - createTable:
+            tableName: invite_codes
+            columns:
+              - column:
+                  name: code
+                  type: bigint
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: apartment_id
+                  type: UUID
+
+        - addForeignKeyConstraint:
+            baseTableName: invite_codes
+            baseColumnNames: apartment_id
+            referencedTableName: apartments
+            referencedColumnNames: id
+            constraintName: fk_apartment

@@ -24,14 +24,15 @@ public class InviteController {
     @PostMapping("/create")
     @Operation(summary = "Создание приглашения",
             description = "Позволяет создать приглашение для добавления нового соседа")
-    public InviteCodeDto createInviteCode(CreateInviteCodeRequest request) {
+    public InviteCodeDto createInviteCode(@RequestBody CreateInviteCodeRequest request) {
         return inviteService.createInviteCode(request);
     }
 
     @PostMapping("/use")
     @Operation(summary = "Использование приглашения",
             description = "Позволяет использовать приглашение вступления в квартиру")
-    public ApartmentInfo useInviteCode(@AuthenticationPrincipal Jwt jwt, UseInviteCodeRequest request) {
+    public ApartmentInfo useInviteCode(@AuthenticationPrincipal Jwt jwt,
+                                       @RequestBody UseInviteCodeRequest request) {
         String userId = jwt.getSubject();
         return inviteService.useInviteCode(userId, request);
     }

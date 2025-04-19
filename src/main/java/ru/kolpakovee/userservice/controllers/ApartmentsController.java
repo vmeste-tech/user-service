@@ -53,8 +53,10 @@ public class ApartmentsController {
     @PostMapping
     @Operation(summary = "Создание квартиры",
             description = "Позволяет создать квартиру")
-    public CreateApartmentResponse createApartment(@RequestBody CreateApartmentRequest request) {
-        return apartmentService.createApartment(request);
+    public CreateApartmentResponse createApartment(@RequestBody CreateApartmentRequest request,
+                                                   @AuthenticationPrincipal Jwt jwt) {
+        String userId = jwt.getSubject();
+        return apartmentService.createApartment(request, UUID.fromString(userId));
     }
 
     @PostMapping("/{apartmentId}/users/{userId}")

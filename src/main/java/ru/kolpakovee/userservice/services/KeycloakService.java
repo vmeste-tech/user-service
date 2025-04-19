@@ -74,7 +74,7 @@ public class KeycloakService {
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
         user.setEnabled(true);
-        user.setEmailVerified(false);
+        user.setEmailVerified(true);
         return user;
     }
 }

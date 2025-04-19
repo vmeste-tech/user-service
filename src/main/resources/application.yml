@@ -24,11 +24,11 @@ spring:
         jwt:
           issuer-uri: ${SECURITY_RESOURCE_SERVER_URL:http://localhost:8080/realms/vmeste.tech}
 
-  liquibase:
-    drop-first: true
+#  liquibase:
+#    drop-first: true
 
 keycloak:
   auth-server-url: ${KEYCLOAK_AUTH_SERVER_URL:http://localhost:8080}
   realm-name: ${KEYCLOAK_REALM_NAME:vmeste.tech}
   client-id: ${KEYCLOAK_CLIENT_ID:be-service}
-  client-secret: ${KEYCLOAK_CLIENT_SECRET:8GhHdFhi2q4dtrNjKmnJU9aHHrGdGlTV}
+  client-secret: ${KEYCLOAK_CLIENT_SECRET:eb1fXQGKiWV0cdKHtTi3hrFL6WyNFdu5}
