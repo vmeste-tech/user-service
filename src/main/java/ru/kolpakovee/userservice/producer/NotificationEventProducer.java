@@ -6,7 +6,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import ru.kolpakovee.userservice.enums.NotificationCategory;
 import ru.kolpakovee.userservice.records.NotificationEvent;
-import ru.kolpakovee.userservice.services.ApartmentUserService;
+import ru.kolpakovee.userservice.repositories.ApartmentUserRepository;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -18,9 +18,9 @@ public class NotificationEventProducer {
     @Value("${spring.kafka.topic}")
     private String topic;
 
-    private final ApartmentUserService apartmentUserService;
-
     private final KafkaTemplate<String, NotificationEvent> kafkaTemplate;
+
+    private final ApartmentUserRepository apartmentUserRepository;
 
     public void send(UUID userId, String message) {
         NotificationEvent event = NotificationEvent.builder()
@@ -34,11 +34,11 @@ public class NotificationEventProducer {
     }
 
     public void sendToAllApartmentUsers(UUID apartmentId, String message) {
-        apartmentUserService.getApartmentUsers(apartmentId).stream()
+        apartmentUserRepository.findAllByIdApartmentId(apartmentId).stream()
                 .map(user -> NotificationEvent.builder()
                         .category(NotificationCategory.USER)
                         .message(message)
-                        .userId(UUID.fromString(user.id()))
+                        .userId(user.getId().getUserId())
                         .timestamp(LocalDateTime.now())
                         .build())
                 .forEach(event -> kafkaTemplate.send(topic, event));
