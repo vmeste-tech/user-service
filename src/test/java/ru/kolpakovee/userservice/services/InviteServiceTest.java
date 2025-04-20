@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import ru.kolpakovee.userservice.entities.InviteCodeEntity;
+import ru.kolpakovee.userservice.producer.NotificationEventProducer;
 import ru.kolpakovee.userservice.records.CreateInviteCodeRequest;
 import ru.kolpakovee.userservice.records.InviteCodeDto;
 import ru.kolpakovee.userservice.repositories.InviteRepository;
@@ -22,6 +23,9 @@ class InviteServiceTest {
 
     @Mock
     private InviteRepository inviteRepository;
+
+    @Mock
+    private NotificationEventProducer producer;
 
     @InjectMocks
     private InviteService inviteService;
