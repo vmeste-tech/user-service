@@ -4,9 +4,11 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.stereotype.Service;
+import ru.kolpakovee.userservice.constants.NotificationMessages;
 import ru.kolpakovee.userservice.entities.UserEntity;
 import ru.kolpakovee.userservice.enums.UserStatus;
 import ru.kolpakovee.userservice.models.apartments.ChangePasswordRequest;
+import ru.kolpakovee.userservice.producer.NotificationEventProducer;
 import ru.kolpakovee.userservice.records.GetUserResponse;
 import ru.kolpakovee.userservice.records.UserRegistrationRequest;
 import ru.kolpakovee.userservice.records.UserResponse;
@@ -23,6 +25,8 @@ public class UserService {
 
     private final KeycloakService keycloakService;
     private final UserRepository repository;
+
+    private final NotificationEventProducer producer;
 
     public GetUserResponse getUser(UUID userId) {
         UserRepresentation userRepresentation = keycloakService.getUserById(String.valueOf(userId));
@@ -41,7 +45,9 @@ public class UserService {
                 .build();
     }
 
+    @Transactional
     public void changePassword(UUID userId, ChangePasswordRequest request) {
+        producer.send(userId, NotificationMessages.PASSWORD_UPDATE);
         keycloakService.updatePassword(String.valueOf(userId), request.getNewPassword());
     }
 
@@ -49,6 +55,7 @@ public class UserService {
     public UserResponse registerUser(UserRegistrationRequest request) {
         UserResponse user = keycloakService.registerUser(request);
         createUser(user.id());
+        producer.send(UUID.fromString(user.id()), NotificationMessages.REGISTER_USER);
         return user;
     }
 

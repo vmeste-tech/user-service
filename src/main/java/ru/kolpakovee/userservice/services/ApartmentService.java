@@ -4,10 +4,12 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.kolpakovee.userservice.constants.NotificationMessages;
 import ru.kolpakovee.userservice.entities.ApartmentEntity;
 import ru.kolpakovee.userservice.entities.ApartmentUserEntity;
 import ru.kolpakovee.userservice.enums.UserStatus;
 import ru.kolpakovee.userservice.models.apartments.*;
+import ru.kolpakovee.userservice.producer.NotificationEventProducer;
 import ru.kolpakovee.userservice.records.GetUserResponse;
 import ru.kolpakovee.userservice.records.ApartmentInfo;
 import ru.kolpakovee.userservice.records.UserInfoDto;
@@ -28,10 +30,14 @@ public class ApartmentService {
     private final UserService userService;
     private final ApartmentUserService apartmentUserService;
 
+    private final NotificationEventProducer producer;
+
     @Transactional
     public CreateApartmentResponse createApartment(CreateApartmentRequest request, UUID userId) {
         ApartmentEntity apartment = createApartmentEntity(request);
         apartmentUserService.addToApartment(apartment.getId(), userId);
+
+        producer.send(userId, NotificationMessages.CREATE_APARTMENT);
 
         return CreateApartmentResponse.builder()
                 .apartmentId(apartment.getId())
@@ -56,6 +62,8 @@ public class ApartmentService {
 
         existedApartment = apartmentRepository.save(existedApartment);
 
+        producer.sendToAllApartmentUsers(apartmentId, NotificationMessages.UPDATE_APARTMENT);
+
         return UpdateApartmentResponse.builder()
                 .id(existedApartment.getId())
                 .address(existedApartment.getAddress())
@@ -66,6 +74,7 @@ public class ApartmentService {
     @Transactional
     public void deleteApartment(UUID apartmentId) {
         // TODO: удалить все правила и задачи
+        producer.sendToAllApartmentUsers(apartmentId, NotificationMessages.DELETE_APARTMENT);
         apartmentUserRepository.deleteAllByIdApartmentId(apartmentId);
         apartmentRepository.deleteById(apartmentId);
     }
@@ -102,13 +111,11 @@ public class ApartmentService {
                 .address(apartment.getAddress())
                 .name(apartment.getName())
                 .users(users.stream()
-                        // TODO: оптимизировать кол-во запросов
                         .map(u -> toUserInfoDto(u.getJoinedAt(), userService.getUser(u.getId().getUserId())))
                         .toList())
                 .build();
     }
 
-    // TODO: использовать мапер
     private UserInfoDto toUserInfoDto(LocalDateTime joinedAt, GetUserResponse user) {
         return UserInfoDto.builder()
                 .type("Пользователь")

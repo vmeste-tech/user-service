@@ -13,6 +13,7 @@ import ru.kolpakovee.userservice.records.GetUserResponse;
 import ru.kolpakovee.userservice.records.ApartmentInfo;
 import ru.kolpakovee.userservice.services.ApartmentService;
 import ru.kolpakovee.userservice.services.ApartmentUserService;
+import ru.kolpakovee.userservice.utils.JwtUtils;
 
 import java.util.List;
 import java.util.UUID;
@@ -37,8 +38,8 @@ public class ApartmentsController {
     }
 
     @GetMapping("/{apartmentId}")
-    @Operation(summary = "Получение квартиры идентификатору",
-            description = "Позволяет получить квартиру по JWT токену пользователя")
+    @Operation(summary = "Получение квартиры по идентификатору",
+            description = "Позволяет получить квартиру идентификатору")
     public GetApartmentResponse getApartment(@PathVariable UUID apartmentId) {
         return apartmentService.getApartment(apartmentId);
     }
@@ -55,8 +56,7 @@ public class ApartmentsController {
             description = "Позволяет создать квартиру")
     public CreateApartmentResponse createApartment(@RequestBody CreateApartmentRequest request,
                                                    @AuthenticationPrincipal Jwt jwt) {
-        String userId = jwt.getSubject();
-        return apartmentService.createApartment(request, UUID.fromString(userId));
+        return apartmentService.createApartment(request, JwtUtils.getUserId(jwt));
     }
 
     @PostMapping("/{apartmentId}/users/{userId}")

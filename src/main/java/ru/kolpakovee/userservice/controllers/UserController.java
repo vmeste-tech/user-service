@@ -12,6 +12,7 @@ import ru.kolpakovee.userservice.records.GetUserResponse;
 import ru.kolpakovee.userservice.records.UserRegistrationRequest;
 import ru.kolpakovee.userservice.records.UserResponse;
 import ru.kolpakovee.userservice.services.UserService;
+import ru.kolpakovee.userservice.utils.JwtUtils;
 
 import java.util.UUID;
 
@@ -40,12 +41,12 @@ public class UserController {
         return userService.registerUser(request);
     }
 
-    @PatchMapping("/{userId}/password")
+    @PatchMapping("/password")
     @Operation(summary = "Обновление пароля",
             description = "Позволяет обновить пароль пользователя")
-    public void changePassword(@PathVariable UUID userId,
+    public void changePassword(@AuthenticationPrincipal Jwt jwt,
                                @RequestBody ChangePasswordRequest request) {
-        userService.changePassword(userId, request);
+        userService.changePassword(JwtUtils.getUserId(jwt), request);
     }
 
     @DeleteMapping("/{userId}")

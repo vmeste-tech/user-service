@@ -3,11 +3,13 @@ package ru.kolpakovee.userservice.services;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.kolpakovee.userservice.constants.NotificationMessages;
 import ru.kolpakovee.userservice.entities.ApartmentEntity;
 import ru.kolpakovee.userservice.entities.ApartmentUserEntity;
 import ru.kolpakovee.userservice.entities.ApartmentUserId;
 import ru.kolpakovee.userservice.entities.UserEntity;
 import ru.kolpakovee.userservice.models.apartments.AddToApartmentResponse;
+import ru.kolpakovee.userservice.producer.NotificationEventProducer;
 import ru.kolpakovee.userservice.records.GetUserResponse;
 import ru.kolpakovee.userservice.repositories.ApartmentRepository;
 import ru.kolpakovee.userservice.repositories.ApartmentUserRepository;
@@ -25,6 +27,7 @@ public class ApartmentUserService {
     private final ApartmentRepository apartmentRepository;
     private final UserRepository userRepository;
     private final UserService userService;
+    private final NotificationEventProducer producer;
 
     public AddToApartmentResponse addToApartment(UUID apartmentId, UUID userId) {
         UserEntity user = userRepository.findById(userId)
@@ -34,6 +37,8 @@ public class ApartmentUserService {
                 .orElseThrow(() -> new EntityNotFoundException("Квартира не найдена."));
 
         ApartmentUserEntity newApartmentUser = apartmentUserRepository.save(createApartmentUser(user, apartment));
+
+        producer.sendToAllApartmentUsers(apartmentId, NotificationMessages.ADD_TO_APARTMENT);
 
         return AddToApartmentResponse.builder()
                 .apartmentId(newApartmentUser.getId().getApartmentId())
@@ -46,6 +51,8 @@ public class ApartmentUserService {
         ApartmentUserId id = new ApartmentUserId();
         id.setApartmentId(apartmentId);
         id.setUserId(userId);
+
+        producer.sendToAllApartmentUsers(apartmentId, NotificationMessages.REMOVE_FROM_APARTMENT);
 
         apartmentUserRepository.deleteById(id);
     }
