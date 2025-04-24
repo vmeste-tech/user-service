@@ -1,5 +1,6 @@
 package ru.kolpakovee.userservice.services;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.keycloak.representations.idm.UserRepresentation;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Service;
 import ru.kolpakovee.userservice.constants.NotificationMessages;
 import ru.kolpakovee.userservice.entities.UserEntity;
 import ru.kolpakovee.userservice.enums.UserStatus;
+import ru.kolpakovee.userservice.records.UpdateUserProfileRequest;
 import ru.kolpakovee.userservice.models.apartments.ChangePasswordRequest;
 import ru.kolpakovee.userservice.producer.NotificationEventProducer;
 import ru.kolpakovee.userservice.records.GetUserResponse;
@@ -25,8 +27,8 @@ public class UserService {
 
     private final KeycloakService keycloakService;
     private final UserRepository repository;
-
     private final NotificationEventProducer producer;
+    private final S3Service s3Service;
 
     public GetUserResponse getUser(UUID userId) {
         UserRepresentation userRepresentation = keycloakService.getUserById(String.valueOf(userId));
@@ -61,6 +63,37 @@ public class UserService {
 
     public void deleteUser(UUID userId) {
         repository.deleteById(userId);
+    }
+
+    @Transactional
+    public GetUserResponse updateUserProfile(UUID userId, UpdateUserProfileRequest request) {
+        UserRepresentation userRepresentation = keycloakService.getUserById(String.valueOf(userId));
+
+        if (request.firstName() != null) {
+            userRepresentation.setFirstName(request.firstName());
+        }
+        if (request.lastName() != null) {
+            userRepresentation.setLastName(request.lastName());
+        }
+        if (request.email() != null) {
+            userRepresentation.setEmail(request.email());
+        }
+
+        keycloakService.updateUser(userRepresentation);
+
+        if (request.profilePictureBase64() != null && !request.profilePictureBase64().isEmpty()) {
+            String fileKey = s3Service.uploadBase64File(request.profilePictureBase64());
+
+            UserEntity user = repository.findById(userId)
+                    .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден"));
+
+            user.setProfilePictureUrl(fileKey);
+            repository.save(user);
+        }
+
+        producer.send(userId, NotificationMessages.PROFILE_UPDATE);
+
+        return getUser(userId);
     }
 
     private UserEntity createUser(String userId) {

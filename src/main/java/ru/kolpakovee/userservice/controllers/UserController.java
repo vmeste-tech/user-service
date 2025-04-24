@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
+import ru.kolpakovee.userservice.records.UpdateUserProfileRequest;
 import ru.kolpakovee.userservice.models.apartments.ChangePasswordRequest;
 import ru.kolpakovee.userservice.records.GetUserResponse;
 import ru.kolpakovee.userservice.records.UserRegistrationRequest;
@@ -39,6 +40,14 @@ public class UserController {
             description = "Позволяет зарегистрировать пользователя в системе")
     public UserResponse register(@RequestBody UserRegistrationRequest request) {
         return userService.registerUser(request);
+    }
+
+    @PatchMapping("/profile")
+    @Operation(summary = "Обновление профиля пользователя",
+            description = "Позволяет обновить имя, фамилию, почту и фото профиля пользователя (фото в формате base64)")
+    public GetUserResponse updateProfile(@AuthenticationPrincipal Jwt jwt,
+                                  @RequestBody UpdateUserProfileRequest request) {
+        return userService.updateUserProfile(JwtUtils.getUserId(jwt), request);
     }
 
     @PatchMapping("/password")

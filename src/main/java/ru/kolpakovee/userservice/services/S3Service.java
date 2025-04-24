@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Base64;
@@ -34,6 +35,28 @@ public class S3Service {
         s3Client.putObject(putRequest);
 
         return keyName.toString();
+    }
+
+    public String uploadBase64File(String base64String) {
+        byte[] fileBytes = Base64.getDecoder().decode(base64String);
+
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentLength(fileBytes.length);
+
+        UUID keyName = UUID.randomUUID();
+
+        String keyNameStr = keyName + ".jpg";
+
+        try (ByteArrayInputStream inputStream = new ByteArrayInputStream(fileBytes)) {
+            PutObjectRequest putRequest = new PutObjectRequest(bucketName, keyNameStr, inputStream, metadata)
+                    .withCannedAcl(CannedAccessControlList.PublicRead);
+
+            s3Client.putObject(putRequest);
+
+            return "https://" + bucketName + ".hb.ru-msk.vkcs.cloud/" + keyNameStr;
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to upload base64 file to S3", e);
+        }
     }
 
     public String getBase64File(String key) {

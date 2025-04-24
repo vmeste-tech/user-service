@@ -19,6 +19,11 @@ public class S3Controller {
         return s3ObjectService.uploadFile(file);
     }
 
+    @PostMapping("/file/upload/base64")
+    public String uploadBase64File(@RequestBody String base64String) {
+        return s3ObjectService.uploadBase64File(base64String);
+    }
+
     @GetMapping("/file/get/{key}")
     public String getFile(@PathVariable String key) {
         return s3ObjectService.getBase64File(key);

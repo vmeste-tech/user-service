@@ -4,6 +4,7 @@ import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 import org.keycloak.admin.client.Keycloak;
+import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
@@ -50,6 +51,11 @@ public class KeycloakService {
                 .users()
                 .get(userId)
                 .resetPassword(credential);
+    }
+
+    public void updateUser(UserRepresentation userRepresentation) {
+        UsersResource usersResource = keycloak.realm(realmName).users();
+        usersResource.get(userRepresentation.getId()).update(userRepresentation);
     }
 
     private String getCreatedId(Response response) {
