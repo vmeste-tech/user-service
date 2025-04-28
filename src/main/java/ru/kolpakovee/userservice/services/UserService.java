@@ -19,6 +19,7 @@ import ru.kolpakovee.userservice.repositories.UserRepository;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -67,33 +68,43 @@ public class UserService {
 
     @Transactional
     public GetUserResponse updateUserProfile(UUID userId, UpdateUserProfileRequest request) {
-        UserRepresentation userRepresentation = keycloakService.getUserById(String.valueOf(userId));
+        updateKeycloakInfo(userId, request);
+        updateLocalUserData(userId, request);
+        producer.send(userId, NotificationMessages.PROFILE_UPDATE);
+        return getUser(userId);
+    }
 
-        if (request.firstName() != null) {
-            userRepresentation.setFirstName(request.firstName());
+    private void updateKeycloakInfo(UUID userId, UpdateUserProfileRequest request) {
+        if (hasKeycloakUpdates(request)) {
+            UserRepresentation user = keycloakService.getUserById(String.valueOf(userId));
+            Optional.ofNullable(request.firstName()).ifPresent(user::setFirstName);
+            Optional.ofNullable(request.lastName()).ifPresent(user::setLastName);
+            Optional.ofNullable(request.email()).ifPresent(user::setEmail);
+            keycloakService.updateUser(user);
         }
-        if (request.lastName() != null) {
-            userRepresentation.setLastName(request.lastName());
-        }
-        if (request.email() != null) {
-            userRepresentation.setEmail(request.email());
-        }
+    }
 
-        keycloakService.updateUser(userRepresentation);
+    private boolean hasKeycloakUpdates(UpdateUserProfileRequest request) {
+        return request.firstName() != null || request.lastName() != null || request.email() != null;
+    }
 
-        if (request.profilePictureBase64() != null && !request.profilePictureBase64().isEmpty()) {
-            String fileKey = s3Service.uploadBase64File(request.profilePictureBase64());
-
+    private void updateLocalUserData(UUID userId, UpdateUserProfileRequest request) {
+        if (hasLocalUpdates(request)) {
             UserEntity user = repository.findById(userId)
                     .orElseThrow(() -> new EntityNotFoundException("Пользователь не найден"));
 
-            user.setProfilePictureUrl(fileKey);
+            Optional.ofNullable(request.profilePictureBase64())
+                    .filter(pic -> !pic.isEmpty())
+                    .ifPresent(pic -> user.setProfilePictureUrl(s3Service.uploadBase64File(pic)));
+
+            Optional.ofNullable(request.status()).ifPresent(user::setStatus);
             repository.save(user);
         }
+    }
 
-        producer.send(userId, NotificationMessages.PROFILE_UPDATE);
-
-        return getUser(userId);
+    private boolean hasLocalUpdates(UpdateUserProfileRequest request) {
+        return request.status() != null ||
+                (request.profilePictureBase64() != null && !request.profilePictureBase64().isEmpty());
     }
 
     private UserEntity createUser(String userId) {
