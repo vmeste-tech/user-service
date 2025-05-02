@@ -53,7 +53,7 @@ public class S3Service {
 
             s3Client.putObject(putRequest);
 
-            return "https://" + bucketName + ".hb.ru-msk.vkcs.cloud/" + keyNameStr;
+            return "https://hb.ru-msk.vkcs.cloud/" + bucketName + "/" + keyNameStr;
         } catch (IOException e) {
             throw new RuntimeException("Failed to upload base64 file to S3", e);
         }
